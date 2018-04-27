@@ -48,6 +48,10 @@ Avito$split = sample.split(Avito$deal_probability,SplitRatio=0.05)
 AvitoTrainVal= subset(Avito, split==TRUE)
 AvitoTest = subset (Avito, split ==FALSE)
 
+AvitoTrainVal$split = sample.split(AvitoTrainVal$deal_probability,SplitRatio=0.7)
+AvitoTrain= subset(AvitoTrainVal, split==TRUE)
+AvitoVal = subset (AvitoTrainVal, split ==FALSE)
+
 #################### MAKE PREDICTIVE MODELS ###################################
 
 ## build generalized linear regression model
