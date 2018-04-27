@@ -6,7 +6,7 @@ Avito = read.csv("Downloads/AvitoTrain.csv")
 library(translate)
 set.key("AIzaSyAJvkZgYIjwNDTiz6pAWZOV-bS4oveRd_4")
 
-##translate(region,"ru","en")
+##translate(text,"ru","en")
 
 ######################### CLEAN UP DATA #######################################
 
@@ -25,7 +25,27 @@ Avito$titleLength <- nchar(Avito$title,allowNA = TRUE, keepNA = 0)
 Avito$descriptionLength <- ifelse (is.na(Avito$description),
 c(0), c(nchar(Avito$description)))
 
+## find unique values for regions, cities, primary categories, categories
+library(dplyr)
 
+regions = unique(Avito$region)
+translatedRegion=NULL
+
+for (region in regions){
+  tRegion = translate (region,"ru","en")
+  translatedRegion=c(translatedRegion,tRegion)
+}
+
+cities = unique(Avito$city)
+translatedCity = NULL
+
+for (i in 970:1733){
+  city=cities[i]
+  tCity = translate (city,"ru","en")
+  translatedCity=c(translatedCity,tCity)
+}
+
+##create binary columns
 
 #drop columns
 Avito$region = NULL
