@@ -25,46 +25,28 @@ Avito$titleLength <- nchar(Avito$title,allowNA = TRUE, keepNA = 0)
 Avito$descriptionLength <- ifelse (is.na(Avito$description),
 c(0), c(nchar(Avito$description)))
 
-## find unique values for regions, cities, primary categories, categories
-library(dplyr)
-
-regions = unique(Avito$region)
-translatedRegion=NULL
-
-for (region in regions){
-  tRegion = translate (region,"ru","en")
-  translatedRegion=c(translatedRegion,tRegion)
-}
-
-cities = unique(Avito$city)
-translatedCity = NULL
-
-for (i in 970:1733){
-  city=cities[i]
-  tCity = translate (city,"ru","en")
-  translatedCity=c(translatedCity,tCity)
-}
-
-##create binary columns
-
-#drop columns
-Avito$region = NULL
-Avito$city = NULL
-Avito$parent_category_name = NULL
-Avito$category_name = NULL
-
 ## count number of parameters
+Avito$P1 <- ifelse (is.na(Avito$param_1),c(0), c(1))
+Avito$P2 <- ifelse (is.na(Avito$param_2),c(0), c(1))
+Avito$P3 <- ifelse (is.na(Avito$param_3),c(0), c(1))
+Avito$numPram <- Avito$P1+Avito$P2+Avito$P3
+Avito$P1 = NULL
+Avito$P2 = NULL
+Avito$P3 = NULL
 
 ##convert date to day released (i.e. date to Sunday or Monday)
-
-##find unique cities and make bin variables
-
-##find unique regions and make bin variables
-
-##find unique cities and make bin variables
+library(lubridate)
+Avito$activation_date <- as.Date(Avito$activation_date)
+Avito$day <- wday(Avito$activation_date,label=TRUE)
+Avito$activation_date = NULL
 
 ##split data into training, testing and validation
+library(caTools)
+library(caret)
 set.seed(1951)
+Avito$split = sample.split(Avito$deal_probability,SplitRatio=0.05)
+AvitoTrainVal= subset(Avito, split==TRUE)
+AvitoTest = subset (Avito, split ==FALSE)
 
 #################### MAKE PREDICTIVE MODELS ###################################
 
