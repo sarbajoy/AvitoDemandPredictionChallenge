@@ -22,18 +22,14 @@ Processes done:
   -Made user type variable binary
   
   -Dropped ID variables from training data set as ID does not affect the decision of ad being successful or not
+  
+  -Converting dates to day of the week (e.g converting 27-04-2018 to Friday)
+  
+  -Counting number of parameter variables present in each row
+  
+  -Splitting data up
 
 Currently performing:
-
-  -Data translation of region, city, parent and main categories
-  
-  -Making these variables binary
-  
-  -Converting dates to day of the week (e.g converting 27-04-2018 to Friday) and then making them binary variables
-
-  -Counting number of parameter variables present in each row
-
-  -Splitting data up
   
   -Generating generalized linear regression model
   
