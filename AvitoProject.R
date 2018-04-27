@@ -15,11 +15,6 @@ Avito$item_id=NULL
 Avito$user_id=NULL
 Avito$image=NULL
 
-##create new columns to separate user type
-Avito$IsPrivate <- ifelse(Avito$user_type == 'Private',c(1), c(0))
-Avito$IsCompany <- ifelse(Avito$user_type == 'Company',c(1), c(0))
-Avito$user_type = NULL
-
 ##find length of title and description
 Avito$titleLength <- nchar(Avito$title,allowNA = TRUE, keepNA = 0)
 Avito$descriptionLength <- ifelse (is.na(Avito$description),
@@ -48,7 +43,8 @@ Avito$split = sample.split(Avito$deal_probability,SplitRatio=0.05)
 AvitoTrainVal= subset(Avito, split==TRUE)
 AvitoTest = subset (Avito, split ==FALSE)
 
-AvitoTrainVal$split = sample.split(AvitoTrainVal$deal_probability,SplitRatio=0.7)
+AvitoTrainVal$split = sample.split(AvitoTrainVal$deal_probability,
+SplitRatio=0.7)
 AvitoTrain= subset(AvitoTrainVal, split==TRUE)
 AvitoVal = subset (AvitoTrainVal, split ==FALSE)
 
