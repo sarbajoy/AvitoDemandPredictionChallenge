@@ -51,7 +51,7 @@ AvitoTrain= subset(AvitoTrainVal, split==TRUE)
 AvitoVal = subset (AvitoTrainVal, split ==FALSE)
 AvitoTrainBackup=AvitoTrain
 
-#################### MAKE PREDICTIVE MODELS ###################################
+#################### MULTIPLE LINEAR REGRESSION ###################################
 
 ## build generalized linear regression model
 linearRegression = lm(deal_probability~region+parent_category_name+price
@@ -147,6 +147,80 @@ linearRegression = lm(deal_probability~isKrasnodarRegion+isKrasnoyarskRegion
 
 summary(linearRegression)
 
+######################### LOGISTIC REGRESSION ##################################
+library(caret)
+logRegression=glm(deal_probability~region+parent_category_name+price
++item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
++day,data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##we see that region does not play a part in log regression, remove region
+logRegression=glm(deal_probability~parent_category_name+price+item_seq_number
++user_type+image_top_1+titleLength+descriptionLength+numParam+day,
+data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##confusion on day variable, so convert to bin variable and run log regression
+logRegression=glm(deal_probability~parent_category_name+price
++item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
++isSun+isMon+isTue+isWed+isThu+isFri+isSat,data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##confusion on parent variable, so convert to bin variable and run log regression
+logRegression=glm(deal_probability~isParentBusiness+isParentHome
++isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
++isParentServices+ price+item_seq_number+user_type+image_top_1+titleLength
++descriptionLength+numParam+isSun+isMon+isTue+isWed+isThu+isFri+isSat,
+data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##remove friday & sat
+logRegression=glm(deal_probability~isParentBusiness+isParentHome
++isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
++isParentServices+ price+item_seq_number+user_type+image_top_1+titleLength
++descriptionLength+numParam+isSun+isMon+isTue+isWed+isThu,data=AvitoTrain,
+family=binomial)
+
+summary(logRegression)
+
+##remove sunday
+logRegression=glm(deal_probability~isParentBusiness+isParentHome
++isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
++isParentServices+ price+item_seq_number+user_type+image_top_1+titleLength
++descriptionLength+numParam+isMon+isTue+isWed+isThu,data=AvitoTrain,
+family=binomial)
+
+summary(logRegression)
+
+##remove last 3 weekdays
+logRegression=glm(deal_probability~isParentBusiness+isParentHome
++isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
++isParentServices+ price+item_seq_number+user_type+image_top_1+titleLength
++descriptionLength+numParam+isMon,data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##remove sequence number
+logRegression=glm(deal_probability~isParentBusiness+isParentHome
++isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
++isParentServices+ price+user_type+image_top_1+titleLength+descriptionLength
++numParam+isMon,data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##remove monday
+logRegression=glm(deal_probability~isParentBusiness+isParentHome
++isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
++isParentServices+ price+user_type+image_top_1+titleLength+descriptionLength
++numParam,data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+####################### CV DECISION TREE MODEL##################################
 ##build continuous variable decision tree model
 
 ##build continuous variable random forest model
