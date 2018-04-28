@@ -28,10 +28,10 @@ Processes done:
   -Counting number of parameter variables present in each row
   
   -Splitting data up
-
-Currently performing:
   
   -Generating generalized linear regression model
+
+Currently performing:
   
   -Generating continuous variable decision tree
   
