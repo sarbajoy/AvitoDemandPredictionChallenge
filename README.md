@@ -29,7 +29,9 @@ Processes done:
   
   -Splitting data up
   
-  -Generating generalized linear regression model
+  -Generated multiple linear regression model
+  
+  -Generated logistic regression model
 
 Currently performing:
   
