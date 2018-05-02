@@ -32,10 +32,10 @@ Processes done:
   -Generated multiple linear regression model
   
   -Generated logistic regression model
-
-Currently performing:
   
   -Generating continuous variable decision tree
+
+Currently performing:
   
   -Generating continuous variable random forest
   
