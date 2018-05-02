@@ -51,9 +51,7 @@ AvitoTrain= subset(AvitoTrainVal, split==TRUE)
 AvitoVal = subset (AvitoTrainVal, split ==FALSE)
 AvitoTrainBackup=AvitoTrain
 
-#################### MULTIPLE LINEAR REGRESSION ###################################
-
-## build generalized linear regression model
+#################### MULTIPLE LINEAR REGRESSION ###############################
 linearRegression = lm(deal_probability~region+parent_category_name+price
 +item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
 +day,data=AvitoTrain)
@@ -107,17 +105,17 @@ summary(linearRegression)
 
 ##we want 5% confidence hence remove tuesday
 linearRegression = lm(deal_probability~isKrasnodarRegion+isKrasnoyarskRegion
-+isNovosibirskRegion +isRostovRegion + isTyumenRegion+parent_category_name+price
-+item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
-+isMon+isWed+isThu,data=AvitoTrain)
++isNovosibirskRegion +isRostovRegion + isTyumenRegion+parent_category_name+
+price+item_seq_number+user_type+image_top_1+titleLength+descriptionLength
++numParam+isMon+isWed+isThu,data=AvitoTrain)
 
 summary(linearRegression)
 
 ##we want 5% confidence hence remove wednesday
 linearRegression = lm(deal_probability~isKrasnodarRegion+isKrasnoyarskRegion
-+isNovosibirskRegion +isRostovRegion + isTyumenRegion+parent_category_name+price
-+item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
-+isMon+isThu,data=AvitoTrain)
++isNovosibirskRegion +isRostovRegion + isTyumenRegion+parent_category_name
++price+item_seq_number+user_type+image_top_1+titleLength+descriptionLength
++numParam+isMon+isThu,data=AvitoTrain)
 
 summary(linearRegression)
 
@@ -221,7 +219,41 @@ logRegression=glm(deal_probability~isParentBusiness+isParentHome
 summary(logRegression)
 
 ####################### CV DECISION TREE MODEL##################################
-##build continuous variable decision tree model
+library(rpart)
+
+decisionTree = rpart(deal_probability~region+isParentBusiness
++isParentHome +isParentAnimals +isParentPersonal+isParentProperty
++isParentTransport+isParentServices+price+item_seq_number+user_type
++image_top_1+titleLength+descriptionLength+numParam+day,data=AvitoTrain,
+method="anova")
+
+printcp(decisionTree) # display the results
+plotcp(decisionTree) # visualize cross-validation results
+summary(decisionTree) # detailed summary of splits
+
+# create additional plots
+par(mfrow=c(1,2)) # two plots on one page
+rsq.rpart(decisionTree) # visualize cross-validation results
+
+# plot tree
+plot(decisionTree, uniform=TRUE,
+  	main="Regression Tree for Deal Probability ")
+text(decisionTree, use.n=TRUE, all=TRUE, cex=.8)
+
+# create attractive postcript plot of tree
+post(decisionTree, file = "Downloads/decisionTree.ps",
+  	title = "Regression Tree for Deal Probability ")
+
+# prune the tree
+pfit<- prune(decisionTree, cp=0.010000) # from cptable
+
+# plot the pruned tree
+plot(pfit, uniform=TRUE,
+  	main="Pruned Regression Tree for Deal Probability")
+text(pfit, use.n=TRUE, all=TRUE, cex=.8)
+post(pfit, file = "Downloads/prunedTree.ps",
+  	title = "Pruned Regression Tree for Deal Probability")
+
 
 ##build continuous variable random forest model
 
