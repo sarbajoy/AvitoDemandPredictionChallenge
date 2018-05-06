@@ -37,6 +37,9 @@ Avito$activation_date = NULL
 
 Avito$price <- ifelse(is.na(Avito$price),c(0),Avito$price)
 
+##convert deal probability to binary variable of if product sold
+Avito$didSell <- ifelse(Avito$deal_probability>0.5,c(1),c(0))
+
 ##split data into training, testing and validation
 library(caTools)
 library(caret)
@@ -57,7 +60,6 @@ linearRegression = lm(deal_probability~region+parent_category_name+price
 +day,data=AvitoTrain)
 
 library(devtools)
-install_github("dgrtwo/broom")
 library(broom)
 
 tidyLR <- tidy(linearRegression)
@@ -147,74 +149,114 @@ summary(linearRegression)
 
 ######################### LOGISTIC REGRESSION ##################################
 library(caret)
-logRegression=glm(deal_probability~region+parent_category_name+price
-+item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
-+day,data=AvitoTrain,family=binomial)
-
-summary(logRegression)
-
-##we see that region does not play a part in log regression, remove region
-logRegression=glm(deal_probability~parent_category_name+price+item_seq_number
+logRegression=glm(didSell~region+parent_category_name+price+item_seq_number
 +user_type+image_top_1+titleLength+descriptionLength+numParam+day,
 data=AvitoTrain,family=binomial)
 
 summary(logRegression)
 
-##confusion on day variable, so convert to bin variable and run log regression
-logRegression=glm(deal_probability~parent_category_name+price
-+item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
-+isSun+isMon+isTue+isWed+isThu+isFri+isSat,data=AvitoTrain,family=binomial)
-
-summary(logRegression)
-
-##confusion on parent variable, so convert to bin variable and run log regression
-logRegression=glm(deal_probability~isParentBusiness+isParentHome
-+isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
-+isParentServices+ price+item_seq_number+user_type+image_top_1+titleLength
-+descriptionLength+numParam+isSun+isMon+isTue+isWed+isThu+isFri+isSat,
+logRegression=glm(didSell~isVolgogradRegion+isKrasnodarRegion
++isKrasnoyarskRegion+isNovosibirskRegion +isRostovRegion + isTyumenRegion
++isParentHome +isParentAnimals +isParentPersonal+isParentProperty
++isParentTransport+isParentServices+price+item_seq_number+user_type+image_top_1
++titleLength+descriptionLength+numParam+isSun+isMon+isTue+isWed+isThu+isFri,
 data=AvitoTrain,family=binomial)
 
 summary(logRegression)
 
-##remove friday & sat
-logRegression=glm(deal_probability~isParentBusiness+isParentHome
-+isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
-+isParentServices+ price+item_seq_number+user_type+image_top_1+titleLength
-+descriptionLength+numParam+isSun+isMon+isTue+isWed+isThu,data=AvitoTrain,
+##remove description length
+logRegression=glm(didSell~isVolgogradRegion+isKrasnodarRegion
++isKrasnoyarskRegion+isNovosibirskRegion +isRostovRegion + isTyumenRegion
++isParentHome +isParentAnimals +isParentPersonal+isParentProperty
++isParentTransport+isParentServices+price+item_seq_number+user_type+image_top_1
++titleLength+numParam+isSun+isMon+isTue+isWed+isThu+isFri,data=AvitoTrain,
 family=binomial)
 
 summary(logRegression)
 
-##remove sunday
-logRegression=glm(deal_probability~isParentBusiness+isParentHome
+##remove volgograd
+logRegression=glm(didSell~isKrasnodarRegion+isKrasnoyarskRegion
++isNovosibirskRegion +isRostovRegion + isTyumenRegion+isParentHome
 +isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
-+isParentServices+ price+item_seq_number+user_type+image_top_1+titleLength
-+descriptionLength+numParam+isMon+isTue+isWed+isThu,data=AvitoTrain,
++isParentServices+price+item_seq_number+user_type+image_top_1+titleLength
++numParam+isSun+isMon+isTue+isWed+isThu+isFri,data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##remove friday
+logRegression=glm(didSell~isKrasnodarRegion+isKrasnoyarskRegion
++isNovosibirskRegion +isRostovRegion + isTyumenRegion+isParentHome
++isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
++isParentServices+price+item_seq_number+user_type+image_top_1+titleLength
++numParam+isSun+isMon+isTue+isWed+isThu,data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##remove friday
+logRegression=glm(didSell~isKrasnodarRegion+isKrasnoyarskRegion
++isNovosibirskRegion +isRostovRegion + isTyumenRegion+isParentHome
++isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
++isParentServices+price+item_seq_number+user_type+image_top_1+titleLength
++numParam+isMon+isTue+isWed+isThu,data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##remove title length
+logRegression=glm(didSell~isKrasnodarRegion+isKrasnoyarskRegion
++isNovosibirskRegion +isRostovRegion + isTyumenRegion+isParentHome
++isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
++isParentServices+price+item_seq_number+user_type+image_top_1+numParam+isMon
++isTue+isWed+isThu,data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##remove krasnoyarsk
+logRegression=glm(didSell~isKrasnodarRegion+isNovosibirskRegion
++isRostovRegion + isTyumenRegion+isParentHome+isParentAnimals +isParentPersonal
++isParentProperty+isParentTransport+isParentServices+price+item_seq_number
++user_type+image_top_1+numParam+isMon+isTue+isWed+isThu,data=AvitoTrain,
 family=binomial)
 
 summary(logRegression)
 
-##remove last 3 weekdays
-logRegression=glm(deal_probability~isParentBusiness+isParentHome
-+isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
-+isParentServices+ price+item_seq_number+user_type+image_top_1+titleLength
-+descriptionLength+numParam+isMon,data=AvitoTrain,family=binomial)
+##remove wednesday
+logRegression=glm(didSell~isKrasnodarRegion+isNovosibirskRegion
++isRostovRegion + isTyumenRegion+isParentHome+isParentAnimals +isParentPersonal
++isParentProperty+isParentTransport+isParentServices+price+item_seq_number
++user_type+image_top_1+numParam+isMon+isTue+isThu,data=AvitoTrain,
+family=binomial)
 
 summary(logRegression)
 
-##remove sequence number
-logRegression=glm(deal_probability~isParentBusiness+isParentHome
-+isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
-+isParentServices+ price+user_type+image_top_1+titleLength+descriptionLength
-+numParam+isMon,data=AvitoTrain,family=binomial)
+##remove Novosibirsk
+logRegression=glm(didSell~isKrasnodarRegion+isRostovRegion +isTyumenRegion
++isParentHome+isParentAnimals +isParentPersonal+isParentProperty
++isParentTransport+isParentServices+price+item_seq_number+user_type
++image_top_1+numParam+isMon+isTue+isThu,data=AvitoTrain,family=binomial)
 
 summary(logRegression)
 
 ##remove monday
-logRegression=glm(deal_probability~isParentBusiness+isParentHome
-+isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
-+isParentServices+ price+user_type+image_top_1+titleLength+descriptionLength
-+numParam,data=AvitoTrain,family=binomial)
+logRegression=glm(didSell~isKrasnodarRegion+isRostovRegion +isTyumenRegion
++isParentHome+isParentAnimals +isParentPersonal+isParentProperty
++isParentTransport+isParentServices+price+item_seq_number+user_type
++image_top_1+numParam+isTue+isThu,data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##remove tuesday
+logRegression=glm(didSell~isKrasnodarRegion+isRostovRegion +isTyumenRegion
++isParentHome+isParentAnimals +isParentPersonal+isParentProperty
++isParentTransport+isParentServices+price+item_seq_number+user_type
++image_top_1+numParam+isThu,data=AvitoTrain,family=binomial)
+
+summary(logRegression)
+
+##remove thursday
+logRegression=glm(didSell~isKrasnodarRegion+isRostovRegion +isTyumenRegion
++isParentHome+isParentAnimals +isParentPersonal+isParentProperty
++isParentTransport+isParentServices+price+item_seq_number+user_type
++image_top_1+numParam,data=AvitoTrain,family=binomial)
 
 summary(logRegression)
 
@@ -254,8 +296,9 @@ text(pfit, use.n=TRUE, all=TRUE, cex=.8)
 post(pfit, file = "Downloads/prunedTree.ps",
   	title = "Pruned Regression Tree for Deal Probability")
 
+## decision TREE
 
-##build continuous variable random forest model
+## random forest
 
 ##build ANN with continuous outcome
 
