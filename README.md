@@ -21,6 +21,8 @@ Processes done:
 
   -Made user type variable binary
   
+  -Added binary variable for deal probability
+  
   -Dropped ID variables from training data set as ID does not affect the decision of ad being successful or not
   
   -Converting dates to day of the week (e.g converting 27-04-2018 to Friday)
@@ -36,6 +38,10 @@ Processes done:
   -Generating continuous variable decision tree
 
 Currently performing:
+
+  - Generating decision tree with binary variable
+  
+  - Generating random forest
   
   -Generating continuous variable random forest
   
