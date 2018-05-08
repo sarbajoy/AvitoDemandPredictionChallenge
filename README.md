@@ -19,9 +19,7 @@ advertisement website based on variables such as:
 
 Processes done:
 
-  - Made user type variable binary
-  
-  - Added binary variable for deal probability
+ - Found mean deal probability (to determine what is the average deal probability)
   
   - Dropped ID variables from training data set as ID does not affect the decision of ad being successful or not
   
@@ -29,22 +27,25 @@ Processes done:
   
   - Counting number of parameter variables present in each row
   
-  - Splitting data up
-  
-  - Generated multiple linear regression model
+  - Found unique regions and parent categories
   
   - Generated logistic regression model
   
-  - Generating continuous variable decision tree
-  
-  - Generating decision tree with binary variable (voided because of infeasibility)
 
 Currently performing:
+
+  - Create binary variables for regions
+  
+  - Create binary variables for parent 
+
+  - Modify log regression
+  
+  - Generating decision tree
   
   - Generating random forest
   
-  - Generating continuous variable random forest
-  
   - Build Artificial Neural Network
+  
+  - Build Gradient Boosting Tree
   
   - Evaluate predictive models
