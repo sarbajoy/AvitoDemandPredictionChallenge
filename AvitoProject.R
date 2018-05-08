@@ -9,6 +9,8 @@ set.key("AIzaSyAJvkZgYIjwNDTiz6pAWZOV-bS4oveRd_4")
 ##translate(text,"ru","en")
 
 ######################### CLEAN UP DATA #######################################
+##find average of deal probability to see standard
+average=mean(Avito$deal_probability)
 
 ##delete columns that do not play a role
 Avito$item_id=NULL
@@ -40,274 +42,26 @@ Avito$price <- ifelse(is.na(Avito$price),c(0),Avito$price)
 ##convert deal probability to binary variable of if product sold
 Avito$didSell <- ifelse(Avito$deal_probability>0.5,c(1),c(0))
 
-##split data into training, testing and validation
-library(caTools)
-library(caret)
-set.seed(1951)
-Avito$split = sample.split(Avito$deal_probability,SplitRatio=0.05)
-AvitoTrainVal= subset(Avito, split==TRUE)
-AvitoTest = subset (Avito, split ==FALSE)
+library(ggplot2)
+library(dplyr)
 
-AvitoTrainVal$split = sample.split(AvitoTrainVal$deal_probability,
-SplitRatio=0.7)
-AvitoTrain= subset(AvitoTrainVal, split==TRUE)
-AvitoVal = subset (AvitoTrainVal, split ==FALSE)
-AvitoTrainBackup=AvitoTrain
-
-#################### MULTIPLE LINEAR REGRESSION ###############################
-linearRegression = lm(deal_probability~region+parent_category_name+price
-+item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
-+day,data=AvitoTrain)
-
-library(devtools)
-library(broom)
-
-tidyLR <- tidy(linearRegression)
-write.csv(tidyLR,"Downloads/tidyLR.csv")
-
-
-##regions determined to be significant according to first iteration of MLR
-AvitoTrain$isVolgogradRegion <- ifelse (AvitoTrain$region ==
-"Волгоградская область",c(1), c(0))
-AvitoTrain$isKrasnodarRegion <- ifelse (AvitoTrain$region ==
-"Краснодарский край",c(1), c(0))
-AvitoTrain$isKrasnoyarskRegion <- ifelse (AvitoTrain$region ==
-"Красноярский край",c(1), c(0))
-AvitoTrain$isNovosibirskRegion <- ifelse (AvitoTrain$region ==
-"Новосибирская область",c(1), c(0))
-AvitoTrain$isRostovRegion <- ifelse (AvitoTrain$region ==
-"Ростовская область",c(1), c(0))
-AvitoTrain$isTyumenRegion <- ifelse (AvitoTrain$region ==
-"Тюменская область",c(1), c(0))
-
-AvitoTrain$isSun <- ifelse (AvitoTrain$day =="Sun",c(1), c(0))
-AvitoTrain$isMon <- ifelse (AvitoTrain$day =="Mon",c(1), c(0))
-AvitoTrain$isTue <- ifelse (AvitoTrain$day =="Tue",c(1), c(0))
-AvitoTrain$isWed <- ifelse (AvitoTrain$day =="Wed",c(1), c(0))
-AvitoTrain$isThu <- ifelse (AvitoTrain$day =="Thu",c(1), c(0))
-AvitoTrain$isFri <- ifelse (AvitoTrain$day =="Fri",c(1), c(0))
-AvitoTrain$isSat <- ifelse (AvitoTrain$day =="Sat",c(1), c(0))
-
-linearRegression = lm(deal_probability~isVolgogradRegion+isKrasnodarRegion
-+isKrasnoyarskRegion+isNovosibirskRegion +isRostovRegion + isTyumenRegion
-+parent_category_name+price+item_seq_number+user_type+image_top_1
-+titleLength+descriptionLength+numParam+isSun+isMon+isTue+isWed+
-isThu+isFri,data=AvitoTrain)
-
-summary(linearRegression)
-
-##remove volgograd, sunday and friday from equation
-
-linearRegression = lm(deal_probability~isKrasnodarRegion+isKrasnoyarskRegion
-+isNovosibirskRegion +isRostovRegion + isTyumenRegion+parent_category_name+price
-+item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
-+isMon+isTue+isWed+isThu,data=AvitoTrain)
-
-summary(linearRegression)
-
-##we want 5% confidence hence remove tuesday
-linearRegression = lm(deal_probability~isKrasnodarRegion+isKrasnoyarskRegion
-+isNovosibirskRegion +isRostovRegion + isTyumenRegion+parent_category_name+
-price+item_seq_number+user_type+image_top_1+titleLength+descriptionLength
-+numParam+isMon+isWed+isThu,data=AvitoTrain)
-
-summary(linearRegression)
-
-##we want 5% confidence hence remove wednesday
-linearRegression = lm(deal_probability~isKrasnodarRegion+isKrasnoyarskRegion
-+isNovosibirskRegion +isRostovRegion + isTyumenRegion+parent_category_name
-+price+item_seq_number+user_type+image_top_1+titleLength+descriptionLength
-+numParam+isMon+isThu,data=AvitoTrain)
-
-summary(linearRegression)
-
-##convert parent categories to binary
-AvitoTrain$isParentBusiness <- ifelse(AvitoTrain$parent_category_name
-=="Для бизнеса",c(1), c(0))
-AvitoTrain$isParentHome <- ifelse(AvitoTrain$parent_category_name
-=="Для дома и дачи",c(1), c(0))
-AvitoTrain$isParentAnimals <- ifelse(AvitoTrain$parent_category_name
- =="Животные",c(1), c(0))
-AvitoTrain$isParentPersonal <- ifelse(AvitoTrain$parent_category_name
-=="Личные вещи",c(1), c(0))
-AvitoTrain$isParentProperty <- ifelse(AvitoTrain$parent_category_name
-=="Недвижимость",c(1), c(0))
-AvitoTrain$isParentTransport <- ifelse(AvitoTrain$parent_category_name
-=="Транспорт",c(1), c(0))
-AvitoTrain$isParentServices <- ifelse(AvitoTrain$parent_category_name
-=="Услуги",c(1), c(0))
-AvitoTrain$isParentHobbies <- ifelse(AvitoTrain$parent_category_name
-=="Хобби и отдых",c(1), c(0))
-
-linearRegression = lm(deal_probability~isKrasnodarRegion+isKrasnoyarskRegion
-+isNovosibirskRegion +isRostovRegion + isTyumenRegion+isParentBusiness
-+isParentHome +isParentAnimals +isParentPersonal+isParentProperty
-+isParentTransport+isParentServices+price+item_seq_number+user_type
-+image_top_1+titleLength+descriptionLength+numParam+isMon+isThu,data=AvitoTrain)
-
-summary(linearRegression)
+##find unique countries and make a table for them
+regions=unique(Avito$region)
+parentCategories=unique(Avito$region)
+days = unique(Avito$day)
 
 ######################### LOGISTIC REGRESSION ##################################
 library(caret)
 logRegression=glm(didSell~region+parent_category_name+price+item_seq_number
 +user_type+image_top_1+titleLength+descriptionLength+numParam+day,
-data=AvitoTrain,family=binomial)
+data=Avito,family=binomial)
 
 summary(logRegression)
 
-logRegression=glm(didSell~isVolgogradRegion+isKrasnodarRegion
-+isKrasnoyarskRegion+isNovosibirskRegion +isRostovRegion + isTyumenRegion
-+isParentHome +isParentAnimals +isParentPersonal+isParentProperty
-+isParentTransport+isParentServices+price+item_seq_number+user_type+image_top_1
-+titleLength+descriptionLength+numParam+isSun+isMon+isTue+isWed+isThu+isFri,
-data=AvitoTrain,family=binomial)
-
-summary(logRegression)
-
-##remove description length
-logRegression=glm(didSell~isVolgogradRegion+isKrasnodarRegion
-+isKrasnoyarskRegion+isNovosibirskRegion +isRostovRegion + isTyumenRegion
-+isParentHome +isParentAnimals +isParentPersonal+isParentProperty
-+isParentTransport+isParentServices+price+item_seq_number+user_type+image_top_1
-+titleLength+numParam+isSun+isMon+isTue+isWed+isThu+isFri,data=AvitoTrain,
-family=binomial)
-
-summary(logRegression)
-
-##remove volgograd
-logRegression=glm(didSell~isKrasnodarRegion+isKrasnoyarskRegion
-+isNovosibirskRegion +isRostovRegion + isTyumenRegion+isParentHome
-+isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
-+isParentServices+price+item_seq_number+user_type+image_top_1+titleLength
-+numParam+isSun+isMon+isTue+isWed+isThu+isFri,data=AvitoTrain,family=binomial)
-
-summary(logRegression)
-
-##remove friday
-logRegression=glm(didSell~isKrasnodarRegion+isKrasnoyarskRegion
-+isNovosibirskRegion +isRostovRegion + isTyumenRegion+isParentHome
-+isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
-+isParentServices+price+item_seq_number+user_type+image_top_1+titleLength
-+numParam+isSun+isMon+isTue+isWed+isThu,data=AvitoTrain,family=binomial)
-
-summary(logRegression)
-
-##remove friday
-logRegression=glm(didSell~isKrasnodarRegion+isKrasnoyarskRegion
-+isNovosibirskRegion +isRostovRegion + isTyumenRegion+isParentHome
-+isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
-+isParentServices+price+item_seq_number+user_type+image_top_1+titleLength
-+numParam+isMon+isTue+isWed+isThu,data=AvitoTrain,family=binomial)
-
-summary(logRegression)
-
-##remove title length
-logRegression=glm(didSell~isKrasnodarRegion+isKrasnoyarskRegion
-+isNovosibirskRegion +isRostovRegion + isTyumenRegion+isParentHome
-+isParentAnimals +isParentPersonal+isParentProperty+isParentTransport
-+isParentServices+price+item_seq_number+user_type+image_top_1+numParam+isMon
-+isTue+isWed+isThu,data=AvitoTrain,family=binomial)
-
-summary(logRegression)
-
-##remove krasnoyarsk
-logRegression=glm(didSell~isKrasnodarRegion+isNovosibirskRegion
-+isRostovRegion + isTyumenRegion+isParentHome+isParentAnimals +isParentPersonal
-+isParentProperty+isParentTransport+isParentServices+price+item_seq_number
-+user_type+image_top_1+numParam+isMon+isTue+isWed+isThu,data=AvitoTrain,
-family=binomial)
-
-summary(logRegression)
-
-##remove wednesday
-logRegression=glm(didSell~isKrasnodarRegion+isNovosibirskRegion
-+isRostovRegion + isTyumenRegion+isParentHome+isParentAnimals +isParentPersonal
-+isParentProperty+isParentTransport+isParentServices+price+item_seq_number
-+user_type+image_top_1+numParam+isMon+isTue+isThu,data=AvitoTrain,
-family=binomial)
-
-summary(logRegression)
-
-##remove Novosibirsk
-logRegression=glm(didSell~isKrasnodarRegion+isRostovRegion +isTyumenRegion
-+isParentHome+isParentAnimals +isParentPersonal+isParentProperty
-+isParentTransport+isParentServices+price+item_seq_number+user_type
-+image_top_1+numParam+isMon+isTue+isThu,data=AvitoTrain,family=binomial)
-
-summary(logRegression)
-
-##remove monday
-logRegression=glm(didSell~isKrasnodarRegion+isRostovRegion +isTyumenRegion
-+isParentHome+isParentAnimals +isParentPersonal+isParentProperty
-+isParentTransport+isParentServices+price+item_seq_number+user_type
-+image_top_1+numParam+isTue+isThu,data=AvitoTrain,family=binomial)
-
-summary(logRegression)
-
-##remove tuesday
-logRegression=glm(didSell~isKrasnodarRegion+isRostovRegion +isTyumenRegion
-+isParentHome+isParentAnimals +isParentPersonal+isParentProperty
-+isParentTransport+isParentServices+price+item_seq_number+user_type
-+image_top_1+numParam+isThu,data=AvitoTrain,family=binomial)
-
-summary(logRegression)
-
-##remove thursday
-logRegression=glm(didSell~isKrasnodarRegion+isRostovRegion +isTyumenRegion
-+isParentHome+isParentAnimals +isParentPersonal+isParentProperty
-+isParentTransport+isParentServices+price+item_seq_number+user_type
-+image_top_1+numParam,data=AvitoTrain,family=binomial)
-
-summary(logRegression)
-
-####################### CV DECISION TREE MODEL##################################
-library(rpart)
-
-anovaDecisionTree = rpart(deal_probability~isVolgogradRegion+isKrasnodarRegion
-+isKrasnoyarskRegion+isNovosibirskRegion +isRostovRegion + isTyumenRegion
-+isParentBusiness+isParentHome +isParentAnimals +isParentPersonal
-+isParentProperty+isParentTransport+isParentServices+price+item_seq_number
-+user_type+image_top_1+titleLength+descriptionLength+numParam+isSun+isMon+isTue
-+isWed+isThu+isFri,data=AvitoTrain,method="anova")
-
-printcp(anovaDecisionTree) # display the results
-plotcp(anovaDecisionTree) # visualize cross-validation results
-summary(anovaDecisionTree) # detailed summary of splits
-
-# create additional plots
-par(mfrow=c(1,2)) # two plots on one page
-rsq.rpart(anovaDecisionTree) # visualize cross-validation results
-
-# plot tree
-plot(anovaDecisionTree, uniform=TRUE,
-  	main="Regression Tree for Deal Probability ")
-text(anovaDecisionTree, use.n=TRUE, all=TRUE, cex=.8)
-
-# create attractive postcript plot of tree
-post(anovaDecisionTree, file = "Downloads/decisionTree.ps",
-  	title = "Regression Tree for Deal Probability ")
-
-# prune the tree
-pfit<- prune(anovaDecisionTree, cp=0.010000) # from cptable
-
-# plot the pruned tree
-plot(pfit, uniform=TRUE,
-  	main="Pruned Regression Tree for Deal Probability")
-text(pfit, use.n=TRUE, all=TRUE, cex=.8)
-post(pfit, file = "Downloads/prunedTree.ps",
-  	title = "Pruned Regression Tree for Deal Probability")
-
-#################### CLASS DECISION TREE MODEL##################################
-classDecisionTree = rpart(didSell~region+parent_category_name+price
-+item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
-+day,data=AvitoTrain,method="class")
-
-printcp(classDecisionTree) # display the results
-plotcp(classDecisionTree) # visualize cross-validation results
-summary(classDecisionTree) # detailed summary of splits
-
-##since decision tree does not yield a feasible solution, we scrap this method
+##decision tree
 
 ## random forest
 
-##build ANN with continuous outcome
+##neural network
+
+##gradient boosting tree
