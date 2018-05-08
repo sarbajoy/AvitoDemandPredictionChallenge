@@ -263,31 +263,32 @@ summary(logRegression)
 ####################### CV DECISION TREE MODEL##################################
 library(rpart)
 
-decisionTree = rpart(deal_probability~region+isParentBusiness
-+isParentHome +isParentAnimals +isParentPersonal+isParentProperty
-+isParentTransport+isParentServices+price+item_seq_number+user_type
-+image_top_1+titleLength+descriptionLength+numParam+day,data=AvitoTrain,
-method="anova")
+anovaDecisionTree = rpart(deal_probability~isVolgogradRegion+isKrasnodarRegion
++isKrasnoyarskRegion+isNovosibirskRegion +isRostovRegion + isTyumenRegion
++isParentBusiness+isParentHome +isParentAnimals +isParentPersonal
++isParentProperty+isParentTransport+isParentServices+price+item_seq_number
++user_type+image_top_1+titleLength+descriptionLength+numParam+isSun+isMon+isTue
++isWed+isThu+isFri,data=AvitoTrain,method="anova")
 
-printcp(decisionTree) # display the results
-plotcp(decisionTree) # visualize cross-validation results
-summary(decisionTree) # detailed summary of splits
+printcp(anovaDecisionTree) # display the results
+plotcp(anovaDecisionTree) # visualize cross-validation results
+summary(anovaDecisionTree) # detailed summary of splits
 
 # create additional plots
 par(mfrow=c(1,2)) # two plots on one page
-rsq.rpart(decisionTree) # visualize cross-validation results
+rsq.rpart(anovaDecisionTree) # visualize cross-validation results
 
 # plot tree
-plot(decisionTree, uniform=TRUE,
+plot(anovaDecisionTree, uniform=TRUE,
   	main="Regression Tree for Deal Probability ")
-text(decisionTree, use.n=TRUE, all=TRUE, cex=.8)
+text(anovaDecisionTree, use.n=TRUE, all=TRUE, cex=.8)
 
 # create attractive postcript plot of tree
-post(decisionTree, file = "Downloads/decisionTree.ps",
+post(anovaDecisionTree, file = "Downloads/decisionTree.ps",
   	title = "Regression Tree for Deal Probability ")
 
 # prune the tree
-pfit<- prune(decisionTree, cp=0.010000) # from cptable
+pfit<- prune(anovaDecisionTree, cp=0.010000) # from cptable
 
 # plot the pruned tree
 plot(pfit, uniform=TRUE,
@@ -296,14 +297,17 @@ text(pfit, use.n=TRUE, all=TRUE, cex=.8)
 post(pfit, file = "Downloads/prunedTree.ps",
   	title = "Pruned Regression Tree for Deal Probability")
 
-## decision TREE
+#################### CLASS DECISION TREE MODEL##################################
+classDecisionTree = rpart(didSell~region+parent_category_name+price
++item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
++day,data=AvitoTrain,method="class")
+
+printcp(classDecisionTree) # display the results
+plotcp(classDecisionTree) # visualize cross-validation results
+summary(classDecisionTree) # detailed summary of splits
+
+##since decision tree does not yield a feasible solution, we scrap this method
 
 ## random forest
 
 ##build ANN with continuous outcome
-
-######################### CLASSIFY DATA #######################################
-
-##text mining
-
-##perform clustering
