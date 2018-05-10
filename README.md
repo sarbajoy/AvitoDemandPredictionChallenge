@@ -31,12 +31,12 @@ Processes done:
   
   - Generated logistic regression model
   
-
-Currently performing:
-
   - Create binary variables for regions
   
   - Create binary variables for parent 
+  
+
+Currently performing:
 
   - Modify log regression
   
