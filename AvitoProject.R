@@ -139,6 +139,30 @@ data=Avito,family=binomial)
 
 summary(logRegression)
 
+##remove variables with significance of 0.5 and above
+
+logRegression=glm(didSell~isSverdlovsk+isSamara+isRostov+isTatarstan+
+isNizhnyNovgorod+isPermRegion+isOrenberg+isKhanty+isTyumen+isBashkortostan+
+isKrasnodar+isOmsk+isBelgorod+isChelyabinsk+isKemerovo++isVladimir+isKalinigrad
++isKrasnoyarsk+isYaroslavl+isUdmurtia+isStavropol+isPersonal+isHome+
+isElectronics+isTransport+isProperty+isAnimals+isHobbies+isServices+price+
+item_seq_number+user_type+image_top_1+titleLength+descriptionLength+numParam
++isSun+isMon+isTue+isWed+isThu+isFri,data=Avito,family=binomial)
+
+summary(logRegression)
+
+##remove variables with significance of 0.05 and above
+
+logRegression=glm(didSell~isSverdlovsk+isSamara+isRostov+isTatarstan+
+isNizhnyNovgorod+isPermRegion+isKhanty+isTyumen+isBashkortostan+isKrasnodar
++isOmsk+isBelgorod+isChelyabinsk+isVladimir+isKalinigrad
++isKrasnoyarsk+isYaroslavl+isUdmurtia+isStavropol+isPersonal+isHome+
+isElectronics+isTransport+isProperty+isAnimals+isHobbies+isServices+price+
+item_seq_number+user_type+image_top_1+numParam+isMon+isTue+isWed+isThu,
+data=Avito,family=binomial)
+
+summary(logRegression)
+
 ##decision tree
 
 ## random forest
