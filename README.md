@@ -34,11 +34,10 @@ Processes done:
   - Create binary variables for regions
   
   - Create binary variables for parent 
-  
-
-Currently performing:
 
   - Modify log regression
+  
+Currently performing:
   
   - Generating decision tree
   
